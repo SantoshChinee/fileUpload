@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+</head>
+<body>
+<h1>File Upload Example</h1>
+<form id="fileUploadForm">
+    <input type="file" id="fileInput" name="file" multiple required>
+    <button type="button" onclick="uploadFile()">Upload</button>
+</form>
+<p id="responseMessage"></p>
+
+<script>
+    async function uploadFile() {
+     const fileInput = document.getElementById("fileInput");
+     const files = fileInput.files;
+
+     if (files.length === 0) {
+         document.getElementById("responseMessage").innerText = "Please select at least one file.";
+         return;
+     }
+
+     const formData = new FormData();
+     for (const file of files) {
+         formData.append("files", file); // "files" matches the backend's parameter name
+     }
+
+     try {
+         const response = await fetch('http://localhost:8080/api/upload/newFiles', {
+             method: 'POST',
+             body: formData
+         });
+
+         if (response.ok) {
+             const message = await response.text();
+             document.getElementById("responseMessage").innerText = message;
+         } else {
+             const error = await response.text();
+             document.getElementById("responseMessage").innerText = `Error: ${error}`;
+         }
+     } catch (error) {
+         document.getElementById("responseMessage").innerText = `Error: ${error.message}`;
+     }
+ }
+
+</script>
+</body>
+</html>
